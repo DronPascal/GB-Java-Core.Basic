@@ -24,7 +24,7 @@ public class Task2 {
 
         String hiddenWord = words[(int) (Math.random() * words.length)];
         StringBuilder codedWord = new StringBuilder("###############");
-        int shift = (codedWord.length() - hiddenWord.length()) / 2;  // or 0 for apple##########
+        int shift = 0;  // or ((codedWord.length() - hiddenWord.length()) / 2) for #####apple#####
         Scanner scanner = new Scanner(System.in);
 
         // Начало игры

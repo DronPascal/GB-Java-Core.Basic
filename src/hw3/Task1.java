@@ -46,7 +46,7 @@ public class Task1 {
                 break;
             }
             // реакция на кол-во оставшихся попыток
-            if (attemptNumber == maxNumber) {
+            if (attemptNumber == maxTryCount) {
                 System.out.println("\nВы не успели угадать число.");
             }
             attemptNumber++;
