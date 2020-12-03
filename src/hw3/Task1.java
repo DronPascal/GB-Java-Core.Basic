@@ -53,6 +53,7 @@ public class Task1 {
         }
 
         System.out.println("Игра завершена!");
+        scanner.close();
     }
 
     public static String fixNumerical(int num, String... arr) {

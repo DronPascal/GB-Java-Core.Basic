@@ -48,6 +48,8 @@ public class Task2 {
             }
             System.out.println("Закодированное слово: " + codedWord);
         }
+
         System.out.println("Игра завершена!");
+        scanner.close();
     }
 }
