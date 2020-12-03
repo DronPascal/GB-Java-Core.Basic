@@ -30,12 +30,12 @@ public class Task1 {
             if (input != randomNumber) {
                 System.out.println("Введенное вами число " + input + " " + ((input > randomNumber) ? "больше" : "меньше") + " загаданного.");
             } else {
-                System.out.println("\nВы угадали!");
+                System.out.println("\nВы угадали! Это было число " + randomNumber + "!");
                 break;
             }
             // Реакция на кол-во оставшихся попыток
             if (attemptNumber == MAX_TRY_COUNT) {
-                System.out.println("\nВы не успели угадать число.");
+                System.out.println("\nВы не успели угадать! Я загадывал число " + randomNumber + ".");
             }
             attemptNumber++;
         }
@@ -43,8 +43,8 @@ public class Task1 {
         System.out.println("Игра завершена!");
         scanner.close();
     }
-    
-    public static int getUserInput(Scanner scanner){
+
+    public static int getUserInput(Scanner scanner) {
         int input = 0;
         while (scanner.hasNext()) {  // Считываем строку
             if (scanner.hasNextInt()) {  // Если в строке число int
