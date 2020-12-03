@@ -10,43 +10,31 @@ public class Task1 {
      * загаданное, или меньше. После победы или проигрыша выводится запрос –
      * «Повторить игру еще раз? 1 – да / 0 – нет»(1 – повторить, 0 – нет).
      */
-    public static void main(String[] args) {
-        int maxNumber = 9;
-        int maxTryCount = 3;
+    private static final int MAX_NUMBER = 9;
+    private static final int MAX_TRY_COUNT = 3;
 
-        int randomNumber = (int) (Math.random() * (maxNumber + 1));
+    public static void main(String[] args) {
+        int randomNumber = (int) (Math.random() * (MAX_NUMBER + 1));
         int attemptNumber = 1;
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Попробуйте угадать число от " + 0 + " до " + maxNumber +
-                "\nУ Вас " + fixNumerical(maxTryCount, "попытка", "попытки", "попыток") + "!");
+        System.out.println("Попробуйте угадать число от " + 0 + " до " + MAX_NUMBER +
+                "\nУ Вас " + fixNumerical(MAX_TRY_COUNT, "попытка", "попытки", "попыток") + "!");
 
-        // основной цикл игры
-        while (attemptNumber <= maxTryCount) {
+        // Основной цикл игры
+        while (attemptNumber <= MAX_TRY_COUNT) {
             System.out.print("\nПопытка №" + attemptNumber + "\nВведите число: ");
-            int input = randomNumber + 1;
-            // цикл ввода числа
-            while (scanner.hasNext()) {  //считываем строку
-                if (scanner.hasNextInt()) {  //если в строке число int
-                    input = scanner.nextInt();  //сохраняем введенное число
-                    if (input >= 0 && input <= maxNumber) {
-                        break;
-                    } else {
-                        System.out.print("Введеное число не входит в интервал от " + 0 + " до " + maxNumber + " Повторите ввод: ");
-                    }
-                } else {
-                    System.out.print(scanner.next() + " не является целым числом! Повторите ввод: ");  //выводим последюю введенную строку
-                }
-            }
-            // реакция на приемлемое введенное число
+            // Ввода числа
+            int input = getUserInput(scanner);
+            // Реакция на приемлемое введенное число
             if (input != randomNumber) {
                 System.out.println("Введенное вами число " + input + " " + ((input > randomNumber) ? "больше" : "меньше") + " загаданного.");
             } else {
                 System.out.println("\nВы угадали!");
                 break;
             }
-            // реакция на кол-во оставшихся попыток
-            if (attemptNumber == maxTryCount) {
+            // Реакция на кол-во оставшихся попыток
+            if (attemptNumber == MAX_TRY_COUNT) {
                 System.out.println("\nВы не успели угадать число.");
             }
             attemptNumber++;
@@ -54,6 +42,23 @@ public class Task1 {
 
         System.out.println("Игра завершена!");
         scanner.close();
+    }
+    
+    public static int getUserInput(Scanner scanner){
+        int input = 0;
+        while (scanner.hasNext()) {  // Считываем строку
+            if (scanner.hasNextInt()) {  // Если в строке число int
+                input = scanner.nextInt();  // Сохраняем введенное число
+                if (input >= 0 && input <= MAX_NUMBER) {
+                    break;
+                } else {
+                    System.out.print("Введеное число не входит в интервал от " + 0 + " до " + MAX_NUMBER + " Повторите ввод: ");
+                }
+            } else {
+                System.out.print(scanner.next() + " не является целым числом! Повторите ввод: ");  //выводим последюю введенную строку
+            }
+        }
+        return input;
     }
 
     public static String fixNumerical(int num, String... arr) {
