@@ -9,8 +9,9 @@ import java.util.Scanner;
 public class TicTacToe {
     private static char[][] map;
     private static int SIZE = 5;
-    public static int WIN_STREAK = SIZE<4 ? 3 : (SIZE <10 ? 4 : 5);
+    private static int WIN_STREAK = SIZE < 4 ? 3 : (SIZE < 10 ? 4 : 5);
     private static boolean EASY_MODE = false;
+    private static boolean isManEverWin = false;
 
     private static final char DOT_X = '❌';
     private static final char DOT_O = '◯';
@@ -19,37 +20,42 @@ public class TicTacToe {
     private static Random random = new Random();
 
     public static void main(String[] args) {
+        while(!isManEverWin) {
         initMap();
         printMap();
+        
+            while (true) {
+                //makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
+                //humanTurn();
+                randomTurn(DOT_X);
 
-        while (true) {
-            humanTurn();
+                int result = isGameOver(DOT_X, WIN_STREAK);
+                if (result == 1) {  //если DOT_X победил
+                    System.out.println("Well Done!");
+                    isManEverWin=true;
+                    break;
+                } else if (result == 0) {  //если ничья
+                    System.out.println("Draw!");
+                    break;
+                }
 
-            int result = isGameOver(DOT_X, WIN_STREAK);
-            if (result == 1) {  //если DOT_X победил
-                System.out.println("Well Done!");
-                break;
-            } else if (result == 0) {  //если ничья
-                System.out.println("Draw!");
-                break;
-            }
+                computerTurn();
 
-            computerTurn();
+                result = isGameOver(DOT_O, WIN_STREAK);
+                if (result == 1) {  //если DOT_X победил
+                    System.out.println("You Lose!");
+                    break;
+                } else if (result == 0) {  //если ничья
+                    System.out.println("Draw!");
+                    break;
+                }
 
-            result = isGameOver(DOT_O, WIN_STREAK);
-            if (result == 1) {  //если DOT_X победил
-                System.out.println("You Lose!");
-                break;
-            } else if (result == 0) {  //если ничья
-                System.out.println("Draw!");
-                break;
+                printMap();
             }
 
             printMap();
+            System.out.println("Game Over!");
         }
-
-        printMap();
-        System.out.println("Game Over!");
     }
 
     /*
@@ -93,6 +99,16 @@ public class TicTacToe {
         map[x][y] = DOT_X;
     }
 
+    public static void randomTurn(char myC) {
+        int x = -1, y = -1;
+        do {
+            x = random.nextInt(SIZE);
+            y = random.nextInt(SIZE);
+        } while (!isCellValid(x, y));
+        map[x][y] = myC;
+        System.out.println("Компьютер выбрал ячейку " + (x + 1) + " " + (y + 1));
+    }
+
     private static void computerTurn() {
         int x = -1, y = -1;
         if (EASY_MODE) {
@@ -106,53 +122,15 @@ public class TicTacToe {
             makeSmartMoveAgainstEnemy(DOT_O, DOT_X);  //сделать ход против противника(в нашем случае человека)
         }
     }
-//    OPTIMIZED
-//    private static int isGameOver2(char С) {
-//        return isGameOver(С, SIZE);
-//    }
-//
-//    private static int isGameOver2(char С, int winStreak) {
-//        /*
-//         * Ничья -> 0
-//         * Игрок с символом (С) победил -> 1
-//         * Игра продолжается -> 2
-//         */
-//        // Проверяем победил ли C на одной из линий
-//        int d1 = 0, d2 = 0;  // Один раз посчитаем кол-во (С) в ряд на главной и побочной диагоналях
-//        for (int i = 0; i < SIZE; i++) {
-//            if (map[i][i] == С) d1++;
-//            else d1 = 0;
-//            if (map[SIZE - i - 1][i] == С) d2++;
-//            else d2 = 0;
-//
-//            int h = 0, v = 0;  // SIZE раз посчитаем кол-во (С) в ряд на горизонтальных и вертикальных линиях
-//            for (int j = 0; j < SIZE; j++) {
-//                if (map[i][j] == С) h++;
-//                else h = 0;
-//                if (map[j][i] == С) v++;
-//                else v = 0;
-//                if (h == winStreak || v == winStreak)  // После каждой проверки символа удостоверяемся, можно ли закончить игру
-//                    return 1;
-//            }
-//            if (d1 == winStreak || d2 == winStreak)  // После каждой проверки символа...
-//                return 1;
-//        }
-//        // Если есть свободные поля, игра продолжается
-//        for (int i = 1; i < SIZE; i++)
-//            for (int j = 0; j < SIZE; j++)
-//                if (map[i][j] == DOT_U)
-//                    return 2;
-//        return 0;
-//    }
 
-    private static int isGameOver(char symb) {
-        return isGameOver(symb, SIZE);
+    private static int isGameOver(char myC) {
+        return isGameOver(myC, WIN_STREAK);
     }
 
-    private static int isGameOver(char symb, int winStreak) {
+    private static int isGameOver(char myC, int winStreak) {
         for (int rowOffset = 0; rowOffset <= SIZE - winStreak; rowOffset++) {
             for (int colOffset = 0; colOffset <= SIZE - winStreak; colOffset++) {
-                if (checkDiagonals(symb, rowOffset, colOffset, winStreak) || checkLanes(symb, rowOffset, colOffset, winStreak))
+                if (checkDiagonals(myC, rowOffset, colOffset, winStreak) || checkLanes(myC, rowOffset, colOffset, winStreak))
                     return 1;
             }
         }
@@ -164,23 +142,23 @@ public class TicTacToe {
         return 0;
     }
 
-    private static boolean checkDiagonals(char symb, int rowOffset, int colOffset, int winStreak) {
+    private static boolean checkDiagonals(char myC, int rowOffset, int colOffset, int winStreak) {
         boolean isD1Win = true, isD2Win = true;
         for (int i = 0; i < winStreak; i++) {
-            isD1Win &= (map[i + rowOffset][i + colOffset] == symb);
-            isD2Win &= (map[rowOffset + winStreak - i - 1][i + colOffset] == symb);
+            isD1Win &= (map[i + rowOffset][i + colOffset] == myC);
+            isD2Win &= (map[rowOffset + winStreak - i - 1][i + colOffset] == myC);
         }
         return (isD1Win || isD2Win);
     }
 
-    private static boolean checkLanes(char symb, int rowOffset, int colOffset, int winStreak) {
+    private static boolean checkLanes(char myC, int rowOffset, int colOffset, int winStreak) {
         boolean isColWin, isRowWin;
         for (int row = rowOffset; row < winStreak + rowOffset; row++) {
             isRowWin = true;
             isColWin = true;
             for (int col = colOffset; col < winStreak + colOffset; col++) {
-                isRowWin &= (map[row][col] == symb);  // Горизонталь
-                isColWin &= (map[col][row] == symb);  // Вертикаль
+                isRowWin &= (map[row][col] == myC);
+                isColWin &= (map[col][row] == myC);
             }
             if (isRowWin || isColWin) return true;
         }
@@ -192,31 +170,21 @@ public class TicTacToe {
     }
 
     private static void makeSmartMoveAgainstEnemy(char myC, char enemyC, int winStreak) {  //автоматически сыграть символом myC против симвла enemyC
-        // (не руководствуясь тем, в каком порядке противник делал предыдущие ходы)
-        int smartX = -1, smartY = -1;  //координаты предстоящего хода (самое слабое место противника)
+        int smartX = -1, smartY = -1;  //координаты предстоящего хода
         /*
          * 1) Проверяем всё поле. Если можем победить, завершаем игру
          */
         if (tryToWin(myC, winStreak)) return;
         /*
          * 2) Спасаемся, если у противника есть winStreak-1 символов в ряд, а рядом свободная ячейка(занимаем ее)
+         * Сходить так, как мог бы победить противник(если передать ему ход), но сделать это своим символом
          */
         if (tryToWin(enemyC, myC, winStreak)) return;
         /*
          * 3) Если победить не вышло, будем обороняться. Находим самые опасные для нас точки.
          * Для этого заполним карту уровня опасности.
-         * -2 - символ противника
-         * -1 - наш символ
-         * 0 - (2*(winStreak-2)+1)^2 - уровень опасности клетки.
          */
-        int[][] hazardMap = fillHazardMap(myC, enemyC, winStreak);
-        System.out.println("HAZARD MAP");
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                System.out.print("\t" + hazardMap[i][j]);
-            }
-            System.out.println();
-        }
+        int[][] hazardMap = getHazardMap(myC, enemyC, winStreak);
         // Узнаем максимальный уровень опасности и кол-во клеток с максимальным уровнем опасности.
         int maxHazardLevel = 0;
         int mhlCellCount = 0;  // Кол-во ячеек с макс. уровнем опасности (mhl)
@@ -317,37 +285,47 @@ public class TicTacToe {
 
     private static boolean tryToWinLanes(char myC, char charToUse, int rowOffset, int colOffset, int winStreak) {
         int h, v, hUi = 0, hUj = 0, vUi = 0, vUj = 0;
+        boolean hWinnable = false, vWinnable = false;
         for (int row = rowOffset; row < winStreak + rowOffset; row++) {
             h = 0;
             v = 0;
+            hWinnable = false;
+            vWinnable = false;
             for (int col = colOffset; col < winStreak + colOffset; col++) {
                 char curHChar = map[row][col];
                 char curVChar = map[col][row];
                 if (curHChar == myC) h++;
                 else if (curHChar == DOT_U) {
+                    hWinnable = true;
                     hUi = row;
                     hUj = col;
                 }
                 if (curVChar == myC) v++;
                 else if (curVChar == DOT_U) {
+                    vWinnable = true;
                     vUi = col;
                     vUj = row;
                 }
             }
-            if (h == winStreak - 1) {
+            if (h == winStreak - 1 && hWinnable) {
                 map[hUi][hUj] = charToUse;
-                System.out.println("Компьютер выбрал ячейку " + (hUi+1) + " " + (hUj+1));
+                System.out.println("Компьютер выбрал ячейку " + (hUi + 1) + " " + (hUj + 1));
                 return true;
-            } else if (v == winStreak - 1) {
+            } else if (v == winStreak - 1 && vWinnable) {
                 map[vUi][vUj] = charToUse;
-                System.out.println("Компьютер выбрал ячейку " + (vUi+1) + " " + (vUj+1));
+                System.out.println("Компьютер выбрал ячейку " + (vUi + 1) + " " + (vUj + 1));
                 return true;
             }
         }
         return false;
     }
 
-    public static int[][] fillHazardMap(char myC, char enemyC, int winStreak) {
+    public static int[][] getHazardMap(char myC, char enemyC, int winStreak) {
+        /*
+         * -2 - символ противника
+         * -1 - наш символ
+         * от 0 до 8*(winStreak-1)+1 - уровень опасности клетки.
+         */
         int[][] hazardMap = new int[SIZE][SIZE];
         int hazardRange = winStreak - 1;
         for (int i = 0; i < SIZE; i++) {
@@ -399,9 +377,8 @@ public class TicTacToe {
         return hazardMap;
     }
 
-
-    private static int hindranceToEnemy(int x, int y, char myC) {
-        return hindranceToEnemy(x, y, SIZE);
+    private static int hindranceToEnemy(int x, int y) {
+        return hindranceToEnemy(x, y, WIN_STREAK);
     }
 
     private static int hindranceToEnemy(int i, int j, int winStreak) {  //просчет помехи(hindrance) для противника, в случае, если мы займем ячейку
@@ -437,7 +414,6 @@ public class TicTacToe {
 
         return hindrance;
     }
-
 }
 
 
