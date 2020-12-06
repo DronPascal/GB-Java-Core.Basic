@@ -9,9 +9,8 @@ import java.util.Scanner;
 public class TicTacToe {
     private static char[][] map;
     private static int SIZE = 5;
-    private static int WIN_STREAK = SIZE < 4 ? 3 : (SIZE < 10 ? 4 : 5);
+    private static int WIN_STREAK = SIZE <= 4 ? 3 : (SIZE <= 10 ? 4 : 5);
     private static boolean EASY_MODE = false;
-    private static boolean isManEverWin = false;
 
     private static final char DOT_X = '❌';
     private static final char DOT_O = '◯';
@@ -20,9 +19,10 @@ public class TicTacToe {
     private static Random random = new Random();
 
     public static void main(String[] args) {
-        while(!isManEverWin) {
-        initMap();
-        printMap();
+        boolean isManEverWin = false;
+        while (!isManEverWin) {
+            initMap();
+            printMap();
         
             while (true) {
                 //makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
@@ -32,7 +32,7 @@ public class TicTacToe {
                 int result = isGameOver(DOT_X, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
                     System.out.println("Well Done!");
-                    isManEverWin=true;
+                    isManEverWin = true;
                     break;
                 } else if (result == 0) {  //если ничья
                     System.out.println("Draw!");
