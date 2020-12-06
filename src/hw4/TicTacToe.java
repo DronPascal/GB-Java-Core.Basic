@@ -19,24 +19,25 @@ public class TicTacToe {
     private static Random random = new Random();
 
     public static void main(String[] args) {
-        boolean isManEverWin = false;
-        int turnCount = 0;
-        while (!isManEverWin) {
-            turnCount = 0;
+        boolean isContinue = true;
+        while (isContinue) {
+            System.out.print("Введите размер поля, на котором хотите сыграть (минимум 3): ");
+            int size = scanner.nextInt();
+            SIZE = size < 3 ? 3 : size;
+            WIN_STREAK = SIZE <= 4 ? 3 : (SIZE <= 10 ? 4 : 5);
+            System.out.println("ДЛЯ ПОБЕДЫ ВЫСТРОЙТЕ " + WIN_STREAK + " СИМВОЛОВ В РЯД!");
 
             initMap();
             printMap();
 
             while (true) {
+                humanTurn();
                 //makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
-                //humanTurn();
-                randomTurn(DOT_X);
-                turnCount++;
+                //randomTurn(DOT_X);
 
                 int result = isGameOver(DOT_X, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
                     System.out.println("Well Done!");
-                    isManEverWin = true;
                     break;
                 } else if (result == 0) {  //если ничья
                     System.out.println("Draw!");
@@ -44,9 +45,8 @@ public class TicTacToe {
                 }
 
                 printMap();
-                printHazardMap(DOT_O, DOT_X);
+                //printHazardMap(DOT_O, DOT_X);
                 computerTurn();
-
 
                 result = isGameOver(DOT_O, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
@@ -59,9 +59,10 @@ public class TicTacToe {
 
                 printMap();
             }
-
             printMap();
             System.out.println("Game Over!");
+            System.out.print("Введите 1, если хотите сыграть еще или 0, если хотите закончить: ");
+            isContinue = scanner.nextInt() == 1;
         }
     }
 
@@ -122,7 +123,7 @@ public class TicTacToe {
         map[x][y] = DOT_X;
     }
 
-    public static void randomTurn(char myC) {
+    private static void randomTurn(char myC) {
         int x = -1, y = -1;
         do {
             x = random.nextInt(SIZE);
@@ -343,7 +344,7 @@ public class TicTacToe {
         return false;
     }
 
-    public static int[][] getHazardMap(char myC, char enemyC, int winStreak) {
+    private static int[][] getHazardMap(char myC, char enemyC, int winStreak) {
         /*
          * -99 - символ противника
          * -77 - наш символ
@@ -371,8 +372,8 @@ public class TicTacToe {
                     for (int row = Math.max(0, i - hazardRange); row <= Math.min(SIZE - 1, i + hazardRange); row++) {
                         if (map[row][j] == enemyC) {
                             hazardMap[i][j]++;
-                            if (++charsInARow >1)  hazardMap[i][j]++;
-                        }else if (map[row][j] == myC){
+                            if (++charsInARow > 1) hazardMap[i][j]++;
+                        } else if (map[row][j] == myC) {
                             hazardMap[i][j]--;
                         } else {
                             charsInARow = 0;
@@ -383,12 +384,11 @@ public class TicTacToe {
                     for (int col = Math.max(0, j - hazardRange); col <= Math.min(SIZE - 1, j + hazardRange); col++) {
                         if (map[i][col] == enemyC) {
                             hazardMap[i][j]++;
-                            if (++charsInARow >1)  hazardMap[i][j]++;
-                        }else if (map[i][col] == myC){
+                            if (++charsInARow > 1) hazardMap[i][j]++;
+                        } else if (map[i][col] == myC) {
                             hazardMap[i][j]--;
-                        }
-                        else {
-                            charsInARow=0;
+                        } else {
+                            charsInARow = 0;
                         }
                     }
                     // Главная диагональ
@@ -402,12 +402,11 @@ public class TicTacToe {
                     for (int row = startRow, col = startCol; row <= Math.min(SIZE - 1, i + hazardRange) && col <= Math.min(SIZE - 1, j + hazardRange); row++, col++) {  // Главная диагональ
                         if (map[row][col] == enemyC) {
                             hazardMap[i][j]++;
-                            if (++charsInARow >1)  hazardMap[i][j]++;
-                        }else if (map[row][col] == myC){
+                            if (++charsInARow > 1) hazardMap[i][j]++;
+                        } else if (map[row][col] == myC) {
                             hazardMap[i][j]--;
-                        }
-                        else {
-                            charsInARow=0;
+                        } else {
+                            charsInARow = 0;
                         }
                     }
                     // Побочная диагональ
@@ -423,12 +422,11 @@ public class TicTacToe {
                     for (int row = startRow, col = startCol; row >= Math.max(0, i - hazardRange) && col <= Math.min(SIZE - 1, j + hazardRange); row--, col++) {  // Главная диагональ
                         if (map[row][col] == enemyC) {
                             hazardMap[i][j]++;
-                            if (++charsInARow >1)  hazardMap[i][j]++;
-                        }else if (map[row][col] == myC){
+                            if (++charsInARow > 1) hazardMap[i][j]++;
+                        } else if (map[row][col] == myC) {
                             hazardMap[i][j]--;
-                        }
-                        else {
-                            charsInARow=0;
+                        } else {
+                            charsInARow = 0;
                         }
                     }
                 }
