@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class TicTacToe {
     private static char[][] map;
-    private static int SIZE = 5;
+    private static int SIZE = 3;
     private static int WIN_STREAK = SIZE <= 4 ? 3 : (SIZE <= 10 ? 4 : 5);
     private static boolean EASY_MODE = false;
 
@@ -20,14 +20,18 @@ public class TicTacToe {
 
     public static void main(String[] args) {
         boolean isManEverWin = false;
+        int turnCount = 0;
         while (!isManEverWin) {
+            turnCount = 0;
+
             initMap();
             printMap();
-        
+
             while (true) {
                 //makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
                 //humanTurn();
                 randomTurn(DOT_X);
+                turnCount++;
 
                 int result = isGameOver(DOT_X, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
@@ -39,7 +43,10 @@ public class TicTacToe {
                     break;
                 }
 
+                printMap();
+                printHazardMap(DOT_O, DOT_X);
                 computerTurn();
+
 
                 result = isGameOver(DOT_O, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
@@ -81,6 +88,22 @@ public class TicTacToe {
         }
     }
 
+    private static void printHazardMap(char myC, char enemyC) {
+        printHazardMap(myC, enemyC, WIN_STREAK);
+    }
+
+    private static void printHazardMap(char myC, char enemyC, int winStreak) {
+        int[][] hazardMap = getHazardMap(myC, enemyC, winStreak);
+        System.out.println("HAZARD MAP for " + myC);
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print("\t" + hazardMap[i][j]);
+            }
+            System.out.println();
+        }
+
+    }
+
     private static boolean isCellValid(int x, int y) {
         return (x >= 0 && x < SIZE && y >= 0 && y < SIZE && map[x][y] == DOT_U);
     }
@@ -106,7 +129,7 @@ public class TicTacToe {
             y = random.nextInt(SIZE);
         } while (!isCellValid(x, y));
         map[x][y] = myC;
-        System.out.println("Компьютер выбрал ячейку " + (x + 1) + " " + (y + 1));
+        System.out.println("Выбор случайной ячейки " + (x + 1) + " " + (y + 1));
     }
 
     private static void computerTurn() {
@@ -181,12 +204,12 @@ public class TicTacToe {
          */
         if (tryToWin(enemyC, myC, winStreak)) return;
         /*
-         * 3) Если победить не вышло, будем обороняться. Находим самые опасные для нас точки.
-         * Для этого заполним карту уровня опасности.
+         * 3) В остальных случаях будем обороняться следующим образом. Находим самые опасные для нас точки.
+         * Для этого заполним карту опасности клеток.
          */
         int[][] hazardMap = getHazardMap(myC, enemyC, winStreak);
         // Узнаем максимальный уровень опасности и кол-во клеток с максимальным уровнем опасности.
-        int maxHazardLevel = 0;
+        int maxHazardLevel = -60;
         int mhlCellCount = 0;  // Кол-во ячеек с макс. уровнем опасности (mhl)
         int maxHazardLevelRow = -1, maxHazardLevelCol = -1;
         for (int i = 0; i < SIZE; i++) {
@@ -221,10 +244,10 @@ public class TicTacToe {
                             mhCellRow = i;
                             mhCellCol = j;
                         }
-                        if (curHindrance == maxHindrance) {
-                            mhCellRow = i;
-                            mhCellCol = j;
-                        }
+//                        if (curHindrance == maxHindrance) {
+//                            mhCellRow = i;
+//                            mhCellCol = j;
+//                        }
                     }
                 }
             }
@@ -322,8 +345,8 @@ public class TicTacToe {
 
     public static int[][] getHazardMap(char myC, char enemyC, int winStreak) {
         /*
-         * -2 - символ противника
-         * -1 - наш символ
+         * -99 - символ противника
+         * -77 - наш символ
          * от 0 до 8*(winStreak-1)+1 - уровень опасности клетки.
          */
         int[][] hazardMap = new int[SIZE][SIZE];
@@ -331,23 +354,42 @@ public class TicTacToe {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (map[i][j] == enemyC) {
-                    hazardMap[i][j] = -2;
+                    hazardMap[i][j] = -99;
                 } else if (map[i][j] == myC) {
-                    hazardMap[i][j] = -1;
+                    hazardMap[i][j] = -77;
                 } else {
                     hazardMap[i][j] = 0;
                     /*
                      * Просчитываем кол-во символов противника на расстоянии winStreak-1 по
                      * диагоналям, горизонтали и вертикали относительно точки [i,j].
                      * Это кол-во будет равняться уровню опасности клетки [i,j].
+                     * P.S Для большей корректности будем добавлять очки за непрерывные ряды симовлов противника,
+                     * ??? а за присутствие наших снимать по 1 баллу.
                      */
                     //  Вертикаль
+                    int charsInARow = 0;
                     for (int row = Math.max(0, i - hazardRange); row <= Math.min(SIZE - 1, i + hazardRange); row++) {
-                        if (map[row][j] == enemyC) hazardMap[i][j]++;
+                        if (map[row][j] == enemyC) {
+                            hazardMap[i][j]++;
+                            if (++charsInARow >1)  hazardMap[i][j]++;
+                        }else if (map[row][j] == myC){
+                            hazardMap[i][j]--;
+                        } else {
+                            charsInARow = 0;
+                        }
                     }
                     //  Горизонталь
+                    charsInARow = 0;
                     for (int col = Math.max(0, j - hazardRange); col <= Math.min(SIZE - 1, j + hazardRange); col++) {
-                        if (map[i][col] == enemyC) hazardMap[i][j]++;
+                        if (map[i][col] == enemyC) {
+                            hazardMap[i][j]++;
+                            if (++charsInARow >1)  hazardMap[i][j]++;
+                        }else if (map[i][col] == myC){
+                            hazardMap[i][j]--;
+                        }
+                        else {
+                            charsInARow=0;
+                        }
                     }
                     // Главная диагональ
                     int startRow = i, startCol = j, offset = 0;
@@ -356,8 +398,17 @@ public class TicTacToe {
                         startRow--;
                         offset++;
                     }
+                    charsInARow = 0;
                     for (int row = startRow, col = startCol; row <= Math.min(SIZE - 1, i + hazardRange) && col <= Math.min(SIZE - 1, j + hazardRange); row++, col++) {  // Главная диагональ
-                        if (map[row][col] == enemyC) hazardMap[i][j]++;
+                        if (map[row][col] == enemyC) {
+                            hazardMap[i][j]++;
+                            if (++charsInARow >1)  hazardMap[i][j]++;
+                        }else if (map[row][col] == myC){
+                            hazardMap[i][j]--;
+                        }
+                        else {
+                            charsInARow=0;
+                        }
                     }
                     // Побочная диагональ
                     startRow = i;
@@ -368,8 +419,17 @@ public class TicTacToe {
                         startRow++;
                         offset++;
                     }
+                    charsInARow = 0;
                     for (int row = startRow, col = startCol; row >= Math.max(0, i - hazardRange) && col <= Math.min(SIZE - 1, j + hazardRange); row--, col++) {  // Главная диагональ
-                        if (map[row][col] == enemyC) hazardMap[i][j]++;
+                        if (map[row][col] == enemyC) {
+                            hazardMap[i][j]++;
+                            if (++charsInARow >1)  hazardMap[i][j]++;
+                        }else if (map[row][col] == myC){
+                            hazardMap[i][j]--;
+                        }
+                        else {
+                            charsInARow=0;
+                        }
                     }
                 }
             }
