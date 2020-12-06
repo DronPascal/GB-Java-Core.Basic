@@ -1,7 +1,6 @@
 package hw4;
 /*
- * "Крестики-нолики N*N" в процедурном стиле c выбором уровня сложности (на харде я не смог его выйграть)
- *
+ * "Крестики-нолики N*N" в процедурном стиле c выбором уровня сложности и длины победной последовательности
  */
 
 import java.util.Random;
@@ -9,7 +8,8 @@ import java.util.Scanner;
 
 public class TicTacToe {
     private static char[][] map;
-    private static int SIZE = 3;
+    private static int SIZE = 5;
+    public static int WIN_STREAK = SIZE<4 ? 3 : (SIZE <10 ? 4 : 5);
     private static boolean EASY_MODE = false;
 
     private static final char DOT_X = '❌';
@@ -25,7 +25,7 @@ public class TicTacToe {
         while (true) {
             humanTurn();
 
-            int result = isGameOver(DOT_X);
+            int result = isGameOver(DOT_X, WIN_STREAK);
             if (result == 1) {  //если DOT_X победил
                 System.out.println("Well Done!");
                 break;
@@ -36,7 +36,7 @@ public class TicTacToe {
 
             computerTurn();
 
-            result = isGameOver(DOT_O);
+            result = isGameOver(DOT_O, WIN_STREAK);
             if (result == 1) {  //если DOT_X победил
                 System.out.println("You Lose!");
                 break;
@@ -106,53 +106,58 @@ public class TicTacToe {
             makeSmartMoveAgainstEnemy(DOT_O, DOT_X);  //сделать ход против противника(в нашем случае человека)
         }
     }
+//    OPTIMIZED
+//    private static int isGameOver2(char С) {
+//        return isGameOver(С, SIZE);
+//    }
+//
+//    private static int isGameOver2(char С, int winStreak) {
+//        /*
+//         * Ничья -> 0
+//         * Игрок с символом (С) победил -> 1
+//         * Игра продолжается -> 2
+//         */
+//        // Проверяем победил ли C на одной из линий
+//        int d1 = 0, d2 = 0;  // Один раз посчитаем кол-во (С) в ряд на главной и побочной диагоналях
+//        for (int i = 0; i < SIZE; i++) {
+//            if (map[i][i] == С) d1++;
+//            else d1 = 0;
+//            if (map[SIZE - i - 1][i] == С) d2++;
+//            else d2 = 0;
+//
+//            int h = 0, v = 0;  // SIZE раз посчитаем кол-во (С) в ряд на горизонтальных и вертикальных линиях
+//            for (int j = 0; j < SIZE; j++) {
+//                if (map[i][j] == С) h++;
+//                else h = 0;
+//                if (map[j][i] == С) v++;
+//                else v = 0;
+//                if (h == winStreak || v == winStreak)  // После каждой проверки символа удостоверяемся, можно ли закончить игру
+//                    return 1;
+//            }
+//            if (d1 == winStreak || d2 == winStreak)  // После каждой проверки символа...
+//                return 1;
+//        }
+//        // Если есть свободные поля, игра продолжается
+//        for (int i = 1; i < SIZE; i++)
+//            for (int j = 0; j < SIZE; j++)
+//                if (map[i][j] == DOT_U)
+//                    return 2;
+//        return 0;
+//    }
 
-    private static int isGameOver(char С) {
-        return isGameOver(С, SIZE);
-    }
-
-    private static int isGameOver2(char С, int winStreak) {
-        /*
-         * Ничья -> 0
-         * Игрок с символом (С) победил -> 1
-         * Игра продолжается -> 2
-         */
-        // Проверяем победил ли C на одной из линий
-        int d1 = 0, d2 = 0;  // Один раз посчитаем кол-во (С) в ряд на главной и побочной диагоналях
-        for (int i = 0; i < SIZE; i++) {
-            if (map[i][i] == С) d1++;
-            else d1 = 0;
-            if (map[SIZE - i - 1][i] == С) d2++;
-            else d2 = 0;
-
-            int h = 0, v = 0;  // SIZE раз посчитаем кол-во (С) в ряд на горизонтальных и вертикальных линиях
-            for (int j = 0; j < SIZE; j++) {
-                if (map[i][j] == С) h++;
-                else h = 0;
-                if (map[j][i] == С) v++;
-                else v = 0;
-                if (h == winStreak || v == winStreak)  // После каждой проверки символа удостоверяемся, можно ли закончить игру
-                    return 1;
-            }
-            if (d1 == winStreak || d2 == winStreak)  // После каждой проверки символа...
-                return 1;
-        }
-        // Если есть свободные поля, игра продолжается
-        for (int i = 1; i < SIZE; i++)
-            for (int j = 0; j < SIZE; j++)
-                if (map[i][j] == DOT_U)
-                    return 2;
-        return 0;
+    private static int isGameOver(char symb) {
+        return isGameOver(symb, SIZE);
     }
 
     private static int isGameOver(char symb, int winStreak) {
-        for (int row = 0; row < SIZE - winStreak; row++) {
-            for (int col = 0; col < SIZE - winStreak; col++) {
-                if (checkDiagonals(symb, row, col, winStreak) || checkLanes(symb, row, col, winStreak)) return 1;
+        for (int rowOffset = 0; rowOffset <= SIZE - winStreak; rowOffset++) {
+            for (int colOffset = 0; colOffset <= SIZE - winStreak; colOffset++) {
+                if (checkDiagonals(symb, rowOffset, colOffset, winStreak) || checkLanes(symb, rowOffset, colOffset, winStreak))
+                    return 1;
             }
         }
         // Если есть свободные поля, игра продолжается
-        for (int i = 1; i < SIZE; i++)
+        for (int i = 0; i < SIZE; i++)
             for (int j = 0; j < SIZE; j++)
                 if (map[i][j] == DOT_U)
                     return 2;
@@ -165,200 +170,272 @@ public class TicTacToe {
             isD1Win &= (map[i + rowOffset][i + colOffset] == symb);
             isD2Win &= (map[rowOffset + winStreak - i - 1][i + colOffset] == symb);
         }
-        return isD1Win || isD2Win;
+        return (isD1Win || isD2Win);
     }
 
     private static boolean checkLanes(char symb, int rowOffset, int colOffset, int winStreak) {
         boolean isColWin, isRowWin;
         for (int row = rowOffset; row < winStreak + rowOffset; row++) {
-            isColWin = true;
             isRowWin = true;
+            isColWin = true;
             for (int col = colOffset; col < winStreak + colOffset; col++) {
-                isColWin &= (map[row][col] == symb);  // Горизонталь
-                isRowWin &= (map[col][row] == symb);  // Вертикаль
+                isRowWin &= (map[row][col] == symb);  // Горизонталь
+                isColWin &= (map[col][row] == symb);  // Вертикаль
             }
-            if (isColWin || isRowWin) return true;
+            if (isRowWin || isColWin) return true;
         }
         return false;
     }
 
-    private static void makeSmartMoveAgainstEnemy(char myC, char enemyC) {  //автоматически сыграть символом myC против симвла enemyC (не руководствуясь тем, куда был сделан ход противником)
-        int weakX = -1, weakY = -1;  //координаты предстоящего хода (самое слабое место противника)
-        /*
-         * 1) проверяем всё поле. Если можем победить, завершаем игру
-         */
-        int myd1 = 0, myd2 = 0, d1i = -1, d2i = -1, d2j = -1;  //один раз посчитаем кол-во НАШИХ ячеек на главной и побочной диагоналях
-        for (int i = 0; i < SIZE; i++) {
-            if (map[i][i] == myC) myd1++;  //поиск на главной диагонали
-            else if (isCellValid(i, i)) d1i = i;  //запоминаем координаты ячейки только если можем ее занять
-            if (map[SIZE - i - 1][i] == myC) myd2++;  //поиск на побочной диагонали
-            else if (isCellValid(SIZE - i - 1, i)) {  //запоминаем координаты ячейки только если можем ее занять
-                d2i = SIZE - i - 1;
-                d2j = i;
-            }
+    private static void makeSmartMoveAgainstEnemy(char myC, char enemyC) {  //автоматически сыграть символом myC против симвла enemyC
+        makeSmartMoveAgainstEnemy(myC, enemyC, WIN_STREAK);
+    }
 
-            int myh = 0, myv = 0, hi = -1, hj = -1, vi = -1, vj = -1;  // SIZE раз посчитаем кол-во НАШИХ ячеек на горизонтальных и вертикальных линиях
+    private static void makeSmartMoveAgainstEnemy(char myC, char enemyC, int winStreak) {  //автоматически сыграть символом myC против симвла enemyC
+        // (не руководствуясь тем, в каком порядке противник делал предыдущие ходы)
+        int smartX = -1, smartY = -1;  //координаты предстоящего хода (самое слабое место противника)
+        /*
+         * 1) Проверяем всё поле. Если можем победить, завершаем игру
+         */
+        if (tryToWin(myC, winStreak)) return;
+        /*
+         * 2) Спасаемся, если у противника есть winStreak-1 символов в ряд, а рядом свободная ячейка(занимаем ее)
+         */
+        if (tryToWin(enemyC, myC, winStreak)) return;
+        /*
+         * 3) Если победить не вышло, будем обороняться. Находим самые опасные для нас точки.
+         * Для этого заполним карту уровня опасности.
+         * -2 - символ противника
+         * -1 - наш символ
+         * 0 - (2*(winStreak-2)+1)^2 - уровень опасности клетки.
+         */
+        int[][] hazardMap = fillHazardMap(myC, enemyC, winStreak);
+        System.out.println("HAZARD MAP");
+        for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (map[i][j] == myC) myh++;
-                else if (isCellValid(i, j)) {  //запоминаем координаты ячейки только если можем ее занять
-                    hi = i;
-                    hj = j;
-                }
-                if (map[j][i] == myC) myv++;
-                else if (isCellValid(j, i)) {  //запоминаем координаты ячейки только если можем ее занять
-                    vi = j;
-                    vj = i;
-                }
+                System.out.print("\t" + hazardMap[i][j]);
             }
-            if (myh == SIZE - 1 && hi != -1 && hj != -1) {  //если есть координаты свободной ячейки на горизонтальной линии и все остальные ячейки на ней наши
-                weakX = hi;
-                weakY = hj;
-            }
-            if (myv == SIZE - 1 && vi != -1 && vj != -1) {  //если есть координаты свободной ячейки на вертикальной линии и все остальные ячейки на ней наши
-                weakX = vi;
-                weakY = vj;
-            }
+            System.out.println();
         }
-        if (myd1 == SIZE - 1 && d1i != -1) {
-            weakX = d1i;
-            weakY = d1i;
-        }
-        if (myd2 == SIZE - 1 && d2i != -1 && d2j != -1) {
-            weakX = d2i;
-            weakY = d2j;
-        }
-
-        /*
-         * 2) если победить не вышло, будем обороняться
-         */
-        if (weakX == -1 && weakY == -1) {
-
-            int maxH = 0, maxV = 0;  //максимумы занятых противником ячеек в опасных строках и столбцах
-            //опасность - это кол-во занятых противником ячеек в линини.
-            int dangerousH = -1, dangerousV = -1;  //самая опасная строка и столбец. У читываться будут только те, которые мы еще не заблокировали своим символом.
-            int d1 = 0, d2 = 0;  //для рассчета кол-ва занятых противником ячеек на главной и побочной диагоналях
-            boolean d1IsDanger = true, d2IsDanger = true;  //если в линии найдется наш знак, то изменим на false
-            for (int i = 0; i < SIZE; i++) {
-                if (map[i][i] == enemyC) d1++;
-                else if (map[i][i] == myC) d1IsDanger = false;
-                if (map[SIZE - i - 1][i] == enemyC) d2++;
-                else if (map[SIZE - i - 1][i] == myC) d2IsDanger = false;
-
-                int h = 0, v = 0;  // SIZE раз посчитаем кол-во крестиков на горизонтальных и вертикальных линиях
-                boolean hIsDanger = true, vIsDanger = true;
-                for (int j = 0; j < SIZE; j++) {  //проверим горизонтальные и вертикальные в одном цикле
-                    if (map[i][j] == enemyC) h++;
-                    else if (map[i][j] == myC) hIsDanger = false;
-                    if (map[j][i] == enemyC) v++;
-                    else if (map[j][i] == myC) vIsDanger = false;
-                }
-                if (h > maxH && hIsDanger) {
-                    dangerousH = i;
-                    maxH = h;
-                }
-                if (v > maxV && vIsDanger) {
-                    dangerousV = i;
-                    maxV = v;
-                }
-            }
-            if (!d1IsDanger) d1 = -1;  //если диагонали не опасны, то дальше они не будут учитываться
-            if (!d2IsDanger)
-                d2 = -1;  //не забываем, что если опасных горизонталей и вертикалей не было, то все еще dangerousH = -1, dangerousV = -1
-            //если нет ни одной опасной линии, значит поле пусто, тогда просто сходим в центр
-            if (d1 == -1 && d2 == -1 && dangerousH == -1 && dangerousV == -1) {
-                weakX = (int) (SIZE / 2);
-                weakY = (int) (SIZE / 2);
-            }
-
-
-            //здесь мы уже имеем представление о самой опасной строке, столбце и диагонялях. Осталось выбрать координаты нашего хода оптимальным способом.
-            int maxDanger = Math.max(Math.max(maxH, maxV), Math.max(d1, d2));
-
-            if (d1 == maxDanger) {  //главная диагональ
-                int hm = -1;
-                for (int i = 0; i < SIZE; i++) {
-                    if (isCellValid(i, i)) {
-                        int hn = hindranceToEnemy(i, i, myC);
-                        if (hn > hm) {
-                            hm = hn;
-                            weakX = i;
-                            weakY = i;
-                        }
-                    }
-                }
-            } else if (d2 == maxDanger) {  //побочная диагональ
-                int hm = -1;
-                for (int i = 0; i < SIZE; i++) {
-                    int xp = SIZE - 1 - i;
-                    if (isCellValid(xp, i)) {
-                        int hn = hindranceToEnemy(xp, i, myC);
-                        if (hn > hm) {
-                            hm = hn;
-                            weakX = xp;
-                            weakY = i;
-                        }
-                    }
-                }
-            } else if (maxH == maxDanger) {  //опасная горизонтальная линия
-                int hm = -1;
-                for (int i = 0; i < SIZE; i++) {
-                    if (isCellValid(dangerousH, i)) {
-                        int hn = hindranceToEnemy(dangerousH, i, myC);
-                        if (hn > hm) {
-                            hm = hn;
-                            weakX = dangerousH;
-                            weakY = i;
-                        }
-                    }
-                }
-            } else if (maxV == maxDanger) {  //опасная вертикальная линия
-                int hm = -1;
-                for (int i = 0; i < SIZE; i++) {
-                    if (isCellValid(i, dangerousV)) {
-                        int hn = hindranceToEnemy(i, dangerousV, myC);
-                        if (hn > hm) {
-                            hm = hn;
-                            weakX = i;
-                            weakY = dangerousV;
-                        }
-                    }
-                }
-            } else
-                do {
-                    weakX = random.nextInt(SIZE);
-                    weakY = random.nextInt(SIZE);
-                } while (!isCellValid(weakX, weakY));
-
-        }
-        //в итоге ходим!!!
-        map[weakX][weakY] = myC;
-        System.out.println("Компьютер выбрал ячейку " + (weakX + 1) + " " + (weakY + 1));  //объективно это он походил, но можно и вернуть функцией пару индексов в основной цикл программы (если что, можно легко поправить в общем)
-    }
-
-    private static int hindranceToEnemy(int x, int y, char myC) {  //просчет помехи(hindrance) для противника, в случае, если мы займем ячейку
-        return hindranceToEnemy(x, y, myC, SIZE);
-    }
-
-    private static int hindranceToEnemy(int x, int y, char myC, int winStreak) {  //просчет помехи(hindrance) для противника, в случае, если мы займем ячейку
-        /*
-         * занятие данной ячейки не помешает противнику (бессмысленно) -> 0
-         * мы защитим только одну линию -> 1
-         * защитим 2 линии -> 2
-         * защитим 3 линии -> 3
-         * защитим 4 линии -> 4
-         */
-        int hDefended = 0, vDefended = 0, d1Defended = 0, d2Defended = 0;
+        // Узнаем максимальный уровень опасности и кол-во клеток с максимальным уровнем опасности.
+        int maxHazardLevel = 0;
+        int mhlCellCount = 0;  // Кол-во ячеек с макс. уровнем опасности (mhl)
+        int maxHazardLevelRow = -1, maxHazardLevelCol = -1;
         for (int i = 0; i < SIZE; i++) {
-            if (map[x][i] == myC)
-                hDefended = 1;
-            if (map[i][y] == myC)
-                vDefended = 1;
-            if (map[i][i] == myC)
-                d1Defended = 1;
-            if (map[SIZE - 1 - i][i] == myC)
-                d2Defended = 1;
+            for (int j = 0; j < SIZE; j++) {
+                if (hazardMap[i][j] > maxHazardLevel) {
+                    maxHazardLevel = hazardMap[i][j];
+                    mhlCellCount = 1;
+                    maxHazardLevelRow = i;
+                    maxHazardLevelCol = j;
+                } else if (hazardMap[i][j] == maxHazardLevel)
+                    mhlCellCount++;
+            }
         }
-        return hDefended + vDefended + d1Defended + d2Defended;
+        /*
+         * 4) Защищаемся с максимальной помехой для противника.
+         * Если ячейка с максимальным уровнем всего одна, то занимаем ее.
+         * Иначе, делаем ход с максимальной помехой для противника,
+         * выбирая из всех ячеек с максимальным уровнем опасности.
+         */
+        if (mhlCellCount == 1) {
+            smartX = maxHazardLevelRow;
+            smartY = maxHazardLevelCol;
+        } else {
+            int maxHindrance = 0;
+            int mhCellRow = -1, mhCellCol = -1;
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (hazardMap[i][j] == maxHazardLevel) {
+                        int curHindrance = hindranceToEnemy(i, j, winStreak);
+                        if (curHindrance > maxHindrance) {
+                            maxHindrance = curHindrance;
+                            mhCellRow = i;
+                            mhCellCol = j;
+                        }
+                        if (curHindrance == maxHindrance) {
+                            mhCellRow = i;
+                            mhCellCol = j;
+                        }
+                    }
+                }
+            }
+            smartX = mhCellRow;
+            smartY = mhCellCol;
+        }
+
+        /*
+         * В итоге ходим!!!
+         */
+        map[smartX][smartY] = myC;
+        System.out.println("Компьютер выбрал ячейку " + (smartX + 1) + " " + (smartY + 1));
+    }
+
+    private static boolean tryToWin(char myC, int winStreak) {
+        return tryToWin(myC, myC, winStreak);
+    }
+
+    private static boolean tryToWin(char myC, char charToUse, int winStreak) {
+        for (int rowOffset = 0; rowOffset <= SIZE - winStreak; rowOffset++) {
+            for (int colOffset = 0; colOffset <= SIZE - winStreak; colOffset++) {
+                if (tryToWinDiagonals(myC, charToUse, rowOffset, colOffset, winStreak) || tryToWinLanes(myC, charToUse, rowOffset, colOffset, winStreak))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean tryToWinDiagonals(char myC, char charToUse, int rowOffset, int colOffset, int winStreak) {
+        int d1 = 0, d2 = 0, d1U = 0, d2U = 0;
+        boolean d1Winnable = false, d2Winnable = false;
+        for (int i = 0; i < winStreak; i++) {
+            char curD1Char = map[i + rowOffset][i + colOffset];
+            char curD2Char = map[rowOffset + winStreak - i - 1][i + colOffset];
+
+            if (curD1Char == myC) d1++;
+            else if (curD1Char == DOT_U) {
+                d1U = i;
+                d1Winnable = true;
+            }
+            if (curD2Char == myC) d2++;
+            else if (curD2Char == DOT_U) {
+                d2U = i;
+                d2Winnable = true;
+            }
+        }
+        if (d1 == winStreak - 1 && d1Winnable) {
+            map[d1U + rowOffset][d1U + colOffset] = charToUse;
+            System.out.println("Компьютер выбрал ячейку " + (d1U + rowOffset + 1) + " " + (d1U + colOffset + 1));
+            return true;
+        } else if (d2 == winStreak - 1 && d2Winnable) {
+            map[rowOffset + winStreak - d2U - 1][d2U + colOffset] = charToUse;
+            System.out.println("Компьютер выбрал ячейку " + (rowOffset + winStreak - d2U) + " " + (d2U + colOffset + 1));
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean tryToWinLanes(char myC, char charToUse, int rowOffset, int colOffset, int winStreak) {
+        int h, v, hUi = 0, hUj = 0, vUi = 0, vUj = 0;
+        for (int row = rowOffset; row < winStreak + rowOffset; row++) {
+            h = 0;
+            v = 0;
+            for (int col = colOffset; col < winStreak + colOffset; col++) {
+                char curHChar = map[row][col];
+                char curVChar = map[col][row];
+                if (curHChar == myC) h++;
+                else if (curHChar == DOT_U) {
+                    hUi = row;
+                    hUj = col;
+                }
+                if (curVChar == myC) v++;
+                else if (curVChar == DOT_U) {
+                    vUi = col;
+                    vUj = row;
+                }
+            }
+            if (h == winStreak - 1) {
+                map[hUi][hUj] = charToUse;
+                System.out.println("Компьютер выбрал ячейку " + (hUi+1) + " " + (hUj+1));
+                return true;
+            } else if (v == winStreak - 1) {
+                map[vUi][vUj] = charToUse;
+                System.out.println("Компьютер выбрал ячейку " + (vUi+1) + " " + (vUj+1));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int[][] fillHazardMap(char myC, char enemyC, int winStreak) {
+        int[][] hazardMap = new int[SIZE][SIZE];
+        int hazardRange = winStreak - 1;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (map[i][j] == enemyC) {
+                    hazardMap[i][j] = -2;
+                } else if (map[i][j] == myC) {
+                    hazardMap[i][j] = -1;
+                } else {
+                    hazardMap[i][j] = 0;
+                    /*
+                     * Просчитываем кол-во символов противника на расстоянии winStreak-1 по
+                     * диагоналям, горизонтали и вертикали относительно точки [i,j].
+                     * Это кол-во будет равняться уровню опасности клетки [i,j].
+                     */
+                    //  Вертикаль
+                    for (int row = Math.max(0, i - hazardRange); row <= Math.min(SIZE - 1, i + hazardRange); row++) {
+                        if (map[row][j] == enemyC) hazardMap[i][j]++;
+                    }
+                    //  Горизонталь
+                    for (int col = Math.max(0, j - hazardRange); col <= Math.min(SIZE - 1, j + hazardRange); col++) {
+                        if (map[i][col] == enemyC) hazardMap[i][j]++;
+                    }
+                    // Главная диагональ
+                    int startRow = i, startCol = j, offset = 0;
+                    while (startRow > 0 && startCol > 0 && offset < hazardRange) {
+                        startCol--;
+                        startRow--;
+                        offset++;
+                    }
+                    for (int row = startRow, col = startCol; row <= Math.min(SIZE - 1, i + hazardRange) && col <= Math.min(SIZE - 1, j + hazardRange); row++, col++) {  // Главная диагональ
+                        if (map[row][col] == enemyC) hazardMap[i][j]++;
+                    }
+                    // Побочная диагональ
+                    startRow = i;
+                    startCol = j;
+                    offset = 0;
+                    while (startRow < SIZE - 1 && startCol > 0 && offset < hazardRange) {
+                        startCol--;
+                        startRow++;
+                        offset++;
+                    }
+                    for (int row = startRow, col = startCol; row >= Math.max(0, i - hazardRange) && col <= Math.min(SIZE - 1, j + hazardRange); row--, col++) {  // Главная диагональ
+                        if (map[row][col] == enemyC) hazardMap[i][j]++;
+                    }
+                }
+            }
+        }
+        return hazardMap;
+    }
+
+
+    private static int hindranceToEnemy(int x, int y, char myC) {
+        return hindranceToEnemy(x, y, SIZE);
+    }
+
+    private static int hindranceToEnemy(int i, int j, int winStreak) {  //просчет помехи(hindrance) для противника, в случае, если мы займем ячейку
+        /*
+         * Представим, что из точки [i,j] выходит 8 лучей.
+         * Луч прерывается, если касается границы поля.
+         * Если длина отдельно взятого луча равна хотя бы winStreak-1,
+         * то мы увеличиваем помеху на 1.
+         * Максимальный уровень помехи равен 8.
+         */
+        int hindrance = 0;
+        boolean N = false, S = false, W = false, E = false; // Север, Юг, Запад, Восток.
+        if (i >= winStreak - 1) {  // N
+            hindrance++;
+            N = true;
+        }
+        if (j >= winStreak - 1) {  // S
+            hindrance++;
+            S = true;
+        }
+        if (i <= SIZE - winStreak) {  // W
+            hindrance++;
+            W = true;
+        }
+        if (j <= SIZE - winStreak) {  // E
+            hindrance++;
+            E = true;
+        }
+        if (N && W) hindrance++;
+        if (N && E) hindrance++;
+        if (S && W) hindrance++;
+        if (S && E) hindrance++;
+
+        return hindrance;
     }
 
 }
