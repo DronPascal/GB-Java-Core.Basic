@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class TicTacToe {
     private static char[][] map;
-    private static int SIZE = 3;
+    private static int SIZE = 5;
     private static int WIN_STREAK = SIZE <= 4 ? 3 : (SIZE <= 10 ? 4 : 5);
     private static boolean EASY_MODE = false;
 
@@ -23,17 +23,17 @@ public class TicTacToe {
         int winCount = 0, loseCount = 0;
 
         boolean isContinue = true;
-        while (playsCount < 100) {
+        while (playsCount < 1000) {
 
             initMap();
-            //printMap();
+            printMap();
 
             while (true) {
                 //humanTurn();
-                makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
+                //makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
                 //randomTurn(DOT_X);
                 //computerTurn();
-                //aiTurn(DOT_X, DOT_O);
+                aiTurn(DOT_X, DOT_O);
 
                 int result = isGameOver(DOT_X, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
@@ -45,10 +45,10 @@ public class TicTacToe {
                     break;
                 }
 
-                //printMap();
+                printMap();
                 //printHazardMap(DOT_O, DOT_X);
-                aiTurn(DOT_O, DOT_X);
-                //computerTurn();
+                //aiTurn(DOT_O, DOT_X);
+                computerTurn();
 
                 result = isGameOver(DOT_O, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
@@ -60,9 +60,9 @@ public class TicTacToe {
                     break;
                 }
 
-                //printMap();
+                printMap();
             }
-            //printMap();
+            printMap();
             playsCount++;
         }
         System.out.println("Побед " + winCount+ " Проигрышей " + loseCount +" Соотношение " + ((double)winCount/loseCount));
