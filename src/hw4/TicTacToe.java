@@ -19,51 +19,53 @@ public class TicTacToe {
     private static Random random = new Random();
 
     public static void main(String[] args) {
+        int playsCount = 0;
+        int winCount = 0, loseCount = 0;
+
         boolean isContinue = true;
-        while (isContinue) {
-            System.out.print("Введите размер поля, на котором хотите сыграть (минимум 3): ");
-            int size = scanner.nextInt();
-            SIZE = size < 3 ? 3 : size;
-            WIN_STREAK = SIZE <= 4 ? 3 : (SIZE <= 10 ? 4 : 5);
-            System.out.println("ДЛЯ ПОБЕДЫ ВЫСТРОЙТЕ " + WIN_STREAK + " СИМВОЛОВ В РЯД!");
+        while (playsCount < 100) {
 
             initMap();
-            printMap();
+            //printMap();
 
             while (true) {
-                humanTurn();
-                //makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
+                //humanTurn();
+                makeSmartMoveAgainstEnemy(DOT_X, DOT_O);
                 //randomTurn(DOT_X);
+                //computerTurn();
+                //aiTurn(DOT_X, DOT_O);
 
                 int result = isGameOver(DOT_X, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
                     System.out.println("Well Done!");
+                    winCount++;
                     break;
                 } else if (result == 0) {  //если ничья
                     System.out.println("Draw!");
                     break;
                 }
 
-                printMap();
+                //printMap();
                 //printHazardMap(DOT_O, DOT_X);
-                computerTurn();
+                aiTurn(DOT_O, DOT_X);
+                //computerTurn();
 
                 result = isGameOver(DOT_O, WIN_STREAK);
                 if (result == 1) {  //если DOT_X победил
                     System.out.println("You Lose!");
+                    loseCount++;
                     break;
                 } else if (result == 0) {  //если ничья
                     System.out.println("Draw!");
                     break;
                 }
 
-                printMap();
+                //printMap();
             }
-            printMap();
-            System.out.println("Game Over!");
-            System.out.print("Введите 1, если хотите сыграть еще или 0, если хотите закончить: ");
-            isContinue = scanner.nextInt() == 1;
+            //printMap();
+            playsCount++;
         }
+        System.out.println("Побед " + winCount+ " Проигрышей " + loseCount +" Соотношение " + ((double)winCount/loseCount));
     }
 
     /*
@@ -95,7 +97,7 @@ public class TicTacToe {
 
     private static void printHazardMap(char myC, char enemyC, int winStreak) {
         int[][] hazardMap = getHazardMap(myC, enemyC, winStreak);
-        System.out.println("HAZARD MAP for " + myC);
+        System.out.println("HAZARD map for " + myC);
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 System.out.print("\t" + hazardMap[i][j]);
@@ -260,6 +262,8 @@ public class TicTacToe {
          * В итоге ходим!!!
          */
         map[smartX][smartY] = myC;
+        pointCheckWinRow = smartX + 1;
+        pointCheckWinColumn = smartY + 1;
         System.out.println("Компьютер выбрал ячейку " + (smartX + 1) + " " + (smartY + 1));
     }
 
@@ -298,10 +302,14 @@ public class TicTacToe {
         if (d1 == winStreak - 1 && d1Winnable) {
             map[d1U + rowOffset][d1U + colOffset] = charToUse;
             System.out.println("Компьютер выбрал ячейку " + (d1U + rowOffset + 1) + " " + (d1U + colOffset + 1));
+            pointCheckWinRow = d1U + rowOffset + 1;
+            pointCheckWinColumn = d1U + colOffset + 1;
             return true;
         } else if (d2 == winStreak - 1 && d2Winnable) {
             map[rowOffset + winStreak - d2U - 1][d2U + colOffset] = charToUse;
             System.out.println("Компьютер выбрал ячейку " + (rowOffset + winStreak - d2U) + " " + (d2U + colOffset + 1));
+            pointCheckWinRow = (rowOffset + winStreak - d2U);
+            pointCheckWinColumn = (d2U + colOffset + 1);
             return true;
         }
         return false;
@@ -334,10 +342,14 @@ public class TicTacToe {
             if (h == winStreak - 1 && hWinnable) {
                 map[hUi][hUj] = charToUse;
                 System.out.println("Компьютер выбрал ячейку " + (hUi + 1) + " " + (hUj + 1));
+                pointCheckWinRow = hUi+1;
+                pointCheckWinColumn = (hUj + 1);
                 return true;
             } else if (v == winStreak - 1 && vWinnable) {
                 map[vUi][vUj] = charToUse;
                 System.out.println("Компьютер выбрал ячейку " + (vUi + 1) + " " + (vUj + 1));
+                pointCheckWinRow = (vUi + 1);
+                pointCheckWinColumn = (vUj + 1);
                 return true;
             }
         }
@@ -471,6 +483,181 @@ public class TicTacToe {
         if (S && E) hindrance++;
 
         return hindrance;
+    }
+
+
+    /*
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+    =====================================================================================================================================
+     */
+    static int pointCheckWinRow;
+    static int pointCheckWinColumn;
+
+    static int testRow; // переменные, с помощью которой комп проверяет возможный выигрыш
+    static int testColumn;// чтобы заблокировать ход или выиграть самому
+
+    private static void aiTurn(char myC, char enemyC) {
+        int rowNumber;
+        int columnNumber;
+
+        System.out.println("\nХод компьютера!");
+
+        if (blockTurn(myC)) {
+            rowNumber = testRow;
+            columnNumber = testColumn;
+        } else if (blockTurn(enemyC)) {
+            rowNumber = testRow;
+            columnNumber = testColumn;
+        } else {
+
+            do {
+                rowNumber = random.nextInt(SIZE);
+                columnNumber = random.nextInt(SIZE);
+            } while (!isCellOccupancy(rowNumber, columnNumber));
+        }
+
+        pointCheckWinRow = rowNumber + 1;
+        pointCheckWinColumn = columnNumber + 1;
+
+        map[rowNumber][columnNumber] = myC;
+
+    }
+
+    private static boolean blockTurn(char symbol) {
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (isCellOccupancy(i, j)) {
+                    map[i][j] = symbol;
+                    pointCheckWinRow = i + 1;
+                    pointCheckWinColumn = j + 1;
+                    if (checkWin(symbol)) {
+                        testRow = i;
+                        testColumn = j;
+                        map[i][j] = DOT_U;
+                        return true;
+                    }
+                    ;
+                    map[i][j] = DOT_U;
+
+                }
+
+
+            }
+
+        }
+        return false;
+
+    }
+
+    private static boolean isCellOccupancy(int rowNumber, int columnNumber) {
+        return map[rowNumber][columnNumber] == DOT_U;
+    }
+
+    private static boolean checkWin(char symbol) {  // универсальная проверка условия для поля любого размера и количества символов для победы
+        int resultCalc = 0;
+
+// проверяем строку и столбец таблицы в точке последнего ответа
+        for (int i = 0; i < SIZE; i++) {
+            if (map[pointCheckWinRow - 1][i] == symbol) {
+                resultCalc++;
+                if (resultCalc == WIN_STREAK) {
+                    return true;
+                }
+            } else {
+                resultCalc = 0;
+            }
+
+        }
+        resultCalc = 0;
+
+        for (int i = 0; i < SIZE; i++) {
+            if (map[i][pointCheckWinColumn - 1] == symbol) {
+                resultCalc++;
+                if (resultCalc == WIN_STREAK) {
+                    return true;
+                }
+            } else {
+                resultCalc = 0;
+            }
+        }
+        resultCalc = 0;
+
+// проверяем прямую диагональ таблицы в точке последнего ответа
+        if (pointCheckWinRow >= pointCheckWinColumn) {
+            int startIndexI = pointCheckWinRow - pointCheckWinColumn;
+            for (int i = startIndexI, j = 0; i < SIZE; i++, j++) {
+                if (map[i][j] == symbol) {
+                    resultCalc++;
+                    if (resultCalc == WIN_STREAK) {
+                        return true;
+                    }
+                } else {
+                    resultCalc = 0;
+                }
+            }
+        }
+
+        resultCalc = 0;
+
+        if (pointCheckWinRow < pointCheckWinColumn) {
+            int startIndexJ = pointCheckWinColumn - pointCheckWinRow;
+            for (int i = 0, j = startIndexJ; j < SIZE; i++, j++) {
+                if (map[i][j] == symbol) {
+                    resultCalc++;
+                    if (resultCalc == WIN_STREAK) {
+                        return true;
+                    }
+                } else {
+                    resultCalc = 0;
+                }
+            }
+        }
+
+        resultCalc = 0;
+
+// проверяем обратную диагональ таблицы в точке последнего ответа
+        if ((pointCheckWinRow + pointCheckWinColumn) < (SIZE + 2)) {
+            int startIndexI = pointCheckWinRow + pointCheckWinColumn - 2;
+            for (int i = startIndexI, j = 0; i >= 0; i--, j++) {
+                if (map[i][j] == symbol) {
+                    resultCalc++;
+                    if (resultCalc == WIN_STREAK) {
+                        return true;
+
+                    }
+                } else {
+                    resultCalc = 0;
+                }
+            }
+        }
+
+        resultCalc = 0;
+
+        if ((pointCheckWinRow + pointCheckWinColumn) >= (SIZE + 2)) {
+            int startIndexJ = pointCheckWinRow + pointCheckWinColumn - SIZE - 1;
+            for (int i = SIZE - 1, j = startIndexJ; j < SIZE; i--, j++) {
+                if (map[i][j] == symbol) {
+                    resultCalc++;
+                    if (resultCalc == WIN_STREAK) {
+                        return true;
+                    }
+                } else {
+                    resultCalc = 0;
+                }
+            }
+        }
+
+        return false;
+
+
     }
 }
 
