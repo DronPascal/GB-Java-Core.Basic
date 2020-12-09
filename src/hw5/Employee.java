@@ -20,13 +20,13 @@ public class Employee {
         age = -1;
     }
 
-    public Employee(String _fullName, String _position, String _email, String _phoneNumber, double _salary, int _age) {
-        fullName = _fullName;
-        position = _position;
-        email = _email;
-        phoneNumber = _phoneNumber;
-        salary = _salary;
-        age = _age;
+    public Employee(String fullName, String position, String email, String phoneNumber, double salary, int age) {
+        this.fullName = fullName;
+        this.position = position;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.salary = salary;
+        this.age = age;
     }
 
     public void printInfo() {
