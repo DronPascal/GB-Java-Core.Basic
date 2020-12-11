@@ -27,7 +27,7 @@ public abstract class Animal {
         System.out.println("swim(" + distance + "): " + (distance >= 0 && distance <= swimLimit ? "true" : "false"));
     }
 
-    public void printAnimalInfo() {
+    public void printAnimalRJSInfo() {
         System.out.println("Animal " + this.toString() + " runLimit: " + runLimit + "; jumpLimit: " + jumpLimit + "; swimLimit: " + swimLimit);
     }
 }
