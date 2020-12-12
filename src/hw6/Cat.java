@@ -7,7 +7,7 @@ public class Cat extends Animal {
 
     public Cat(double runLimit, double jumpLimit, double swimLimit) {
         super(runLimit, jumpLimit, swimLimit);
-        //если добавится еще какое-то ограничение, то будем его описывать тут + добавим поле для этого ограничения в этом классе
+        //если добавится еще какое-то специфическое ограничение, то будем его описывать тут + добавим поле для этого ограничения в этом классе
     }
 
     @Override

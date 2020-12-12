@@ -43,15 +43,27 @@ public abstract class Animal {
         return swimLimit;
     }
 
-    public void setRunLimit(double runLimit) {
-        this.runLimit = runLimit;
+    public boolean setRunLimit(double runLimit) {
+        if (runLimit >= 0) {
+            this.runLimit = runLimit;
+            return true;
+        }
+        return false;
     }
 
-    public void setJumpLimit(double jumpLimit) {
-        this.jumpLimit = jumpLimit;
+    public boolean setJumpLimit(double jumpLimit) {
+        if (jumpLimit >= 0) {
+            this.jumpLimit = jumpLimit;
+            return true;
+        }
+        return false;
     }
 
-    public void setSwimLimit(double swimLimit) {
-        this.swimLimit = swimLimit;
+    public boolean setSwimLimit(double swimLimit) {
+        if (swimLimit >= 0) {
+            this.swimLimit = swimLimit;
+            return true;
+        }
+        return false;
     }
 }
