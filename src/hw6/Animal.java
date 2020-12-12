@@ -1,7 +1,7 @@
 package hw6;
 
 public abstract class Animal {
-    protected double runLimit, jumpLimit, swimLimit;
+    private double runLimit, jumpLimit, swimLimit;
 
     public Animal() {
         runLimit = 0;
@@ -29,5 +29,29 @@ public abstract class Animal {
 
     public void printAnimalRJSInfo() {
         System.out.println("Animal " + this.toString() + " runLimit: " + runLimit + "; jumpLimit: " + jumpLimit + "; swimLimit: " + swimLimit);
+    }
+
+    public double getRunLimit() {
+        return runLimit;
+    }
+
+    public double getJumpLimit() {
+        return jumpLimit;
+    }
+
+    public double getSwimLimit() {
+        return swimLimit;
+    }
+
+    public void setRunLimit(double runLimit) {
+        this.runLimit = runLimit;
+    }
+
+    public void setJumpLimit(double jumpLimit) {
+        this.jumpLimit = jumpLimit;
+    }
+
+    public void setSwimLimit(double swimLimit) {
+        this.swimLimit = swimLimit;
     }
 }

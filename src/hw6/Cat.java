@@ -12,7 +12,7 @@ public class Cat extends Animal {
 
     @Override
     public void swim(double distance) {
-        if (swimLimit == 0) System.out.println("Cat can't swim!");  // Обычные коты не умеют плавать
+        if (getSwimLimit() == 0) System.out.println("This cat can't swim!");  // Обычные коты не умеют плавать
         else super.swim(distance);
     }
 }
