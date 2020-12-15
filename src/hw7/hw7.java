@@ -25,7 +25,7 @@ public class hw7 {
             // Пусть их именами остаются идентификаторы
             System.out.println("\nСытость кота " + cat.toString() + ": " + cat.getSatiety());
             if (!cat.getSatiety()) {
-                System.out.println("Он подошел к миске со стойким желанием отведать " + cat.getEatLimit() + " еды:");
+                System.out.println("Он подошел к миске с желанием отведать " + cat.getEatLimit() + " единиц еды:");
                 cat.eatFrom(dish);
                 System.out.println("Сытость кота " + cat.toString() + ": " + cat.getSatiety());
             }
