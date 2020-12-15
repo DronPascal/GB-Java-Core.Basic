@@ -23,9 +23,12 @@ public class hw7 {
 
         for (Cat cat : cats) {  // Сat - ссылочный тип, поэтому можно и так обходить. Возможность менять объекты Cat не пропадает
             // Пусть их именами остаются идентификаторы
-            System.out.println("\nКот " + cat.toString() + " подошел к миске со стойким желанием отведать "+cat.getEatLimit()+" еды:");
-            cat.eatFrom(dish);
-            System.out.println("Сытость кота: " + cat.getSatiety());
+            System.out.println("\nСытость кота " + cat.toString() + ": " + cat.getSatiety());
+            if (!cat.getSatiety()) {
+                System.out.println("Он подошел к миске со стойким желанием отведать " + cat.getEatLimit() + " еды:");
+                cat.eatFrom(dish);
+                System.out.println("Сытость кота " + cat.toString() + ": " + cat.getSatiety());
+            }
         }
     }
 }
