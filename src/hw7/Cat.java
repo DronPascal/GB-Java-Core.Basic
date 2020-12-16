@@ -24,11 +24,6 @@ public class Cat extends Animal {
         else super.swim(distance);
     }
 
-    // Создал сеттер чтобы можно было отдельно настроить свойство проглотства
-    public void setEatLimit(double eatLimit) {
-        this.eatLimit = eatLimit;
-    }
-
     public void eatFrom(FoodContainer foodContainer) {
         if (foodContainer != null) {
             double foodVolume = foodContainer.getFoodVolume();
@@ -46,11 +41,16 @@ public class Cat extends Animal {
                 foodContainer.decreaseFood(eatLimit);
                 satiety = true;
             }
-        } else System.out.println("Ошибка.");
+        } else System.out.println("NullPointerException.");
     }
 
     public double getEatLimit() {
         return eatLimit;
+    }
+
+    // Создал сеттер чтобы можно было отдельно настроить свойство проглотства
+    public void setEatLimit(double eatLimit) {
+        this.eatLimit = eatLimit;
     }
 
     public boolean getSatiety() {

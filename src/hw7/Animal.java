@@ -1,13 +1,10 @@
 package hw7;
 
 public abstract class Animal {
-    private double runLimit, jumpLimit, swimLimit;
-
-    public Animal() {
-        runLimit = 0;
-        jumpLimit = 0;
-        swimLimit = 0;
-    }
+    private double
+            runLimit=0,
+            jumpLimit=0,
+            swimLimit=0;
 
     public Animal(double runLimit, double jumpLimit, double swimLimit) {
         this.runLimit = runLimit;

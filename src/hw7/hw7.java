@@ -10,10 +10,10 @@ package hw7;
  */
 public class hw7 {
     public static void main(String[] args) {
-        //миска
+        // Миска
         FoodContainer dish = new Dish(20);
         dish.setFoodVolume(15);
-        //коты
+        // Коты
         Cat[] cats = new Cat[3];
         cats[0] = new Cat();  // Дефолтный кот, ест 10
         cats[1] = new Cat();
