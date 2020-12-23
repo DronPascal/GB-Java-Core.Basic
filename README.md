@@ -1,5 +1,5 @@
 # Java-Core.Basic
-Java Core. Базовый уровень
+GB. Java Core. Базовый уровень
 ___
 ### Урок 1. Java. Введение
 1. Создать пустой проект в IntelliJ IDEA и прописать метод main();
